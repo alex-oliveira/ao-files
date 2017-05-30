@@ -3,7 +3,7 @@
   "type": "package",
   "name": "alex-oliveira/ao-files",
   "homepage": "https://github.com/alex-oliveira/ao-files",
-  "description": "",
+  "description": "Resources for Files with Laravel.",
   "keywords": ["alex-oliveira", "laravel", "files"],
   "authors": [
     {

@@ -2,19 +2,6 @@
 
 ### 1) Installing
 ````
-"require": {
-    "alex-oliveira/ao-files": "1.0.*"
-},
-````
-````
-"repositories": [{
-    "type": "vcs",
-    "url": "https://bitbucket.org/alex-oliveira/ao-files.git"
-}]
-````
-
-or
-````
 $ composer require alex-oliveira/ao-files
 ````
 
@@ -28,79 +15,125 @@ $ composer require alex-oliveira/ao-files
 ],
 ````
 
-### 3) Configuring migration
+### 3) Publish migrations
+````
+$ php artisan vendor:publish
+$ composer dump
+````
+
+
+
+
+
+# Utilization 
+
+## Migration
+
+### Up
 ````
 public function up()
 {
-    Schema::create('category_file', function (Blueprint $table) {
-        $table->integer('category_id')->unsigned();
-        $table->foreign('category_id')->references('id')->on('categories');
+    AoFiles()->schema()->create('posts');
+}
+````
+the same that
+````
+public function up()
+{    
+    Schema::create('ao_files_x_posts', function (Blueprint $table) {
+        $table->integer('post_id')->unsigned();
+        $table->foreign('post_id', 'fk_posts_x_ao_files')->references('id')->on('posts');
         
         $table->bigInteger('file_id')->unsigned();
-        $table->foreign('file_id')->references('id')->on('ao_files_files');
+        $table->foreign('file_id', 'fk_ao_files_x_posts')->references('id')->on('ao_files_files');
         
-        $table->primary(['category_id', 'file_id']);
+        $table->primary(['post_id', 'file_id'], 'pk_ao_files_x_posts');
     });
-}
-
-public function down()
-{
-    Schema::drop('category_file');
 }
 ````
 
-### 4) Configuring model
+### Down
+````
+public function down()
+{
+    AoFiles()->schema()->drop('posts');
+}
+````
+the same that
+````
+public function down()
+{    
+    Schema::dropIfExists('ao_files_x_posts');
+}
+````
+
+
+
+
+
+## Model
 ````
 namespace App\Models;
 
 use AoFiles\Models\File;
 use Illuminate\Database\Eloquent\Model;
 
-class Category extends Model
+class Post extends Model
 {
+
     /**
      * @return File[]|\Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function files()
     {
-        return $this->belongsToMany(File::class);
+        return $this->belongsToMany(File::class, AoFiles()->schema()->table($this->getTable()));
     }
+    
 }
 ````
-
-### 5) Creating controller class
+the same that
 ````
-namespace App\Controllers\Categories;
+return $this->belongsToMany(File::class, 'ao_files_x_posts');
+````
+
+
+
+
+
+## Controller
+````
+namespace App\Http\Controllers\Posts;
 
 use AoFiles\Controllers\AoFilesController;
-use App\Models\Category;
+use App\Models\Post;
 
 class FilesController extends AoFilesController
 {
 
-    protected $dynamicClass = Category::class;
-
-    protected $subFolders = ['categories' => 'category_id'];
-
+    protected $dynamicClass = Post::class;
+    
+    protected $subFolders = ['posts' => 'post_id'];
+    
 }
 ````
 
-### 6) Configuring routes
+
+
+
+
+## Routes
 ````
-Route::group(['prefix' => 'categories', 'as' => 'categories.'], function () {
-    
-    AoFiles()->router()->controller('Categories\FilesController')->foreign('category_id')->make();
-    
-    Route::get('/',                 ['as' => 'index',       'uses' => 'CategoriesController@index']);
-    Route::get('/{id}',             ['as' => 'show',        'uses' => 'CategoriesController@show']);
-    Route::post('/',                ['as' => 'store',       'uses' => 'CategoriesController@store']);
-    Route::put('/{id}',             ['as' => 'update',      'uses' => 'CategoriesController@update']););
-    Route::delete('/{id}',          ['as' => 'destroy',     'uses' => 'CategoriesController@destroy']);
+Route::group(['prefix' => 'posts', 'as' => 'posts.'], function () {
+
+    AoFiles()->router()->controller('Posts\FilesController')->foreign('post_id')->make();
+    .
+    .
+    .
     
 });
 ````
 
-### 7) Cheking routes
+### Checking routes
 ````
 $ php artisan route:list
 ````
