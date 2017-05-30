@@ -1,0 +1,25 @@
+{
+  "license": "MIT",
+  "type": "package",
+  "name": "alex-oliveira/ao-files",
+  "homepage": "https://github.com/alex-oliveira/ao-files",
+  "description": "",
+  "keywords": ["alex-oliveira", "laravel", "files"],
+  "authors": [
+    {
+      "name": "Alex Oliveira",
+      "homepage": "https://github.com/alex-oliveira",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "AoFiles\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.5.9",
+    "laravel/framework": "5.*",
+    "alex-oliveira/ao-scrud": "dev-master"
+  }
+}
